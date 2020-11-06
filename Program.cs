@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Drawing;
+using Console = Colorful.Console;
 
 namespace Area51 {
     class Program {
@@ -10,7 +11,6 @@ namespace Area51 {
 
 
         static void Introduction() {
-
             Console.WriteLine("            .-;$HHHHHHX$+;-.\n" +
                               "        ,;X@@X%/;=----=:/%X@@X/,\n" +
                               "      =$@@%=.              .=+H@X:\n" +
@@ -30,7 +30,7 @@ namespace Area51 {
                               "    =X@@@@@@@@@@@@@@@@@@@@@@@@@@@@X=\n" +
                               "      :$@@@@@@@@@@@@@@@@@@@M@@@@$:\n" +
                               "        ,;@@@@@@@@@@@@@@@@@@@X/-\n" +
-                              "           .-;+$XXHHHHHX$+;-.\n");
+                              "           .-;+$XXHHHHHX$+;-.\n", Color.Orange);
 
             Console.WriteLine("Welcome to Black Mesa Elevator Simulator!");
             Console.WriteLine("-----------------------------------------");

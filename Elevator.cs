@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Console = Colorful.Console;
 
 namespace Area51 {
     class Elevator {
