@@ -10,10 +10,10 @@ namespace BlackMesa {
         public Clearance Clearance { get; }
         public Floor CurrentFloor { get; set; }
         public Elevator Elevator { get; }
-        public bool hasWorked;
 
-        ManualResetEvent eventLeftWork = new ManualResetEvent(false);
-
+        public ManualResetEvent LeftWork = new ManualResetEvent(false);
+        public ManualResetEvent InElevator = new ManualResetEvent(false);
+        public ManualResetEvent HasWorked = new ManualResetEvent(false);
 
         public Agent(string name, Color color, Clearance clearance, Elevator elevator) {
             Name = name;
@@ -21,30 +21,21 @@ namespace BlackMesa {
             Clearance = clearance;
             CurrentFloor = Floor.G;
             Elevator = elevator;
-            hasWorked = false;
-        }
-
-        public bool LeftWork {
-            get {
-                return eventLeftWork.WaitOne(0);
-            }
         }
 
         public void GoToWork() {
-            while (!LeftWork) {
+            while (!LeftWork.WaitOne(0)) {
                 Elevator.Occupy(this);
-                if(Elevator.CurrentAgent == this) {
-                    Elevator.eventIsOccupied.WaitOne();
-                    if(this.hasWorked && CurrentFloor == Floor.G) {
-                        LeaveWork();
-                    }
+                if (InElevator.WaitOne(0)) {
+                    InElevator.WaitOne();
                 }
                 Thread.Sleep(2000);
             }
         }
-        
-        public void LeaveWork() {
-            eventLeftWork.Set();
+
+        public void GoHome() {
+            Console.WriteLine($"{Name} has called it a day.", Color.Red);
+            LeftWork.Set();
         }
 
         public bool CanLeaveAtFloor(Floor floor) {
@@ -64,10 +55,10 @@ namespace BlackMesa {
             do {
                 val = rand.Next(10);
                 if (val == 0) {
-                    newFloor = Floor.G;
+                    newFloor = Floor.S;
                 }
                 else if (val < 4) {
-                    newFloor = Floor.S;
+                    newFloor = Floor.G;
                 }
                 else if (val < 7) {
                     newFloor = Floor.T1;
@@ -77,7 +68,7 @@ namespace BlackMesa {
                 }
             }
             while (newFloor == CurrentFloor);
-            
+
             return newFloor;
         }
     }

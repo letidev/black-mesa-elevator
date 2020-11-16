@@ -16,9 +16,10 @@ namespace BlackMesa {
             t1.Start();
             t2.Start();
 
-            while (!Gordon.LeftWork || !Eli.LeftWork) { }
-
-            Console.WriteLine("Everyone left work");
+            while (!Gordon.LeftWork.WaitOne(0) || !Eli.LeftWork.WaitOne(0)) { }
+            
+            Console.WriteLine("Everyone left work", Color.Red);
+            Console.WriteLine("Press ENTER to exit.");
             Console.ReadLine();
         }
 

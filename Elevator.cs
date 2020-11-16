@@ -36,27 +36,36 @@ namespace BlackMesa {
         }
 
         private void Move(Floor floor) {
-            eventIsMoving.Set();
+            //eventIsMoving.Set();
             Console.WriteLine($"Elevator is moving from floor {CurrentFloor.ToString()} to {floor.ToString()}.", ConsoleColor);
             int travelTime = Math.Abs(CurrentFloor - floor) * 2000;
             CurrentFloor = floor;
             Thread.Sleep(travelTime);
             Console.WriteLine($"Elevator has arrived at floor {CurrentFloor.ToString()}.", ConsoleColor);
-            eventIsMoving.Reset();
+            //eventIsMoving.Reset();
         }
 
         public void Occupy(Agent agent) {
+            if (CurrentFloor == Floor.G && agent.HasWorked.WaitOne(0)) {
+                return;
+            }
+
             if (!IsOccupied) {
-                eventIsOccupied.Set();
-                CurrentAgent = agent;
-                // if the agent has traveled at least once with the 
-                // elevator, he's done good job and next time 
-                // he arrives at floor G, he can leave.
-                CurrentAgent.hasWorked = true;
-                Call();
+                lock (eventIsOccupied) {
+                    eventIsOccupied.Set();
+                    CurrentAgent = agent;
+                    // if the agent has traveled at least once with the 
+                    // elevator, he's done good job and next time 
+                    // he arrives at floor G, he can leave.
+                    CurrentAgent.InElevator.Set();
+                    CurrentAgent.HasWorked.Set();
+                    Call();
+                }
             }
             else {
-                Console.WriteLine($"{agent.Name} cannot call the elevator as it is currently occupied by {CurrentAgent.Name}", agent.ConsoleColor);
+                Console.WriteLine($"{agent.Name} cannot call the elevator as it is currently occupied.", agent.ConsoleColor);
+                return;
+
             }
         }
 
@@ -81,6 +90,7 @@ namespace BlackMesa {
             CloseDoor();
             Move(floor);
             Console.WriteLine($"{CurrentAgent.Name} has arrived at floor {CurrentFloor}", CurrentAgent.ConsoleColor);
+            CurrentAgent.CurrentFloor = CurrentFloor;
 
             if (CurrentAgent.CanLeaveAtFloor(CurrentFloor)) {
                 OpenDoor();
@@ -93,22 +103,28 @@ namespace BlackMesa {
 
         public void Leave() {
             Console.WriteLine($"{CurrentAgent.Name} is leaving the elevator at floor {CurrentFloor}", CurrentAgent.ConsoleColor);
-            Thread.Sleep(1000);
-            CurrentAgent = null;
-            eventIsOccupied.Reset();
+            CurrentAgent.InElevator.Reset();
+            if (CurrentFloor == Floor.G) {
+                CurrentAgent.GoHome();
+            }
+            lock (eventIsOccupied) {
+                eventIsOccupied.Reset();
+                CurrentAgent = null;
+                //Thread.Sleep(1000);
+            }
         }
 
         // Door actions
         private void OpenDoor() {
             eventIsDoorClosed.Reset();
             Console.WriteLine("Door is opening", ConsoleColor);
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
         }
 
         private void CloseDoor() {
             eventIsDoorClosed.Set();
             Console.WriteLine("Door is closing", ConsoleColor);
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
         }
 
         // check elevator status parametres
