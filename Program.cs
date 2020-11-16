@@ -5,21 +5,31 @@ using Console = Colorful.Console;
 namespace BlackMesa {
     class Program {
         static void Main() {
-            // Introduction();
+            Introduction();
 
             Elevator elevator = new Elevator();
-            Agent Gordon = new Agent("Dr. Gordon Freeman", Color.Orange, Clearance.TopSecret, elevator);
-            Agent Eli = new Agent("Dr. Eli Vance", Color.Lime, Clearance.Secret, elevator);
 
-            Thread t1 = new Thread(Gordon.GoToWork);
-            Thread t2 = new Thread(Eli.GoToWork);
-            t1.Start();
-            t2.Start();
+            Thread[] threads = new Thread[3];
+            Agent[] agents = new Agent[3];
+            agents[0] = new Agent("Dr. Gordon Freeman", Color.Orange, Clearance.TopSecret, elevator);
+            agents[1] = new Agent("Dr. Eli Vance", Color.Lime, Clearance.Secret, elevator);
+            agents[2] = new Agent("Barney Calhoun", Color.Cyan, Clearance.Confidential, elevator);
 
-            while (!Gordon.LeftWork.WaitOne(0) || !Eli.LeftWork.WaitOne(0)) { }
+            for (int i = 0; i < 3; i++) {
+                threads[i] = new Thread(agents[i].GoToWork);
+                threads[i].Priority = ThreadPriority.AboveNormal;
+            }
+
+            foreach(var t in threads) {
+                t.Start();
+            }
+
+            foreach(var t in threads) {
+                t.Join();
+            }
             
             Console.WriteLine("Everyone left work", Color.Red);
-            Console.WriteLine("Press ENTER to exit.");
+            Console.WriteLine("Press ENTER to exit.", Color.White);
             Console.ReadLine();
         }
 
@@ -33,7 +43,7 @@ namespace BlackMesa {
             Console.WriteLine("-----------------------------------------");
             Console.WriteLine("Here you can observe our special agents going up and\n" +
                               "down the elevator until they decide to leave. Black\n" +
-                              "Mesa, as we've built it here, has different floors each\n" +
+                              "Mesa, as we've built it here, has different floors, each\n" +
                               "with different security clearance.\n");
             Console.WriteLine("The floors of the base are as follows:\n" +
                 "  - G  - ground floor\n" +
@@ -48,16 +58,17 @@ namespace BlackMesa {
 
             Console.WriteLine("At the beginning of each day all our scientists\n" +
                               "start at the ground floor - that's where\n" +
-                              "the elevator is initially, too. Somebody\n" +
+                              "the elevator initially is, too. Somebody\n" +
                               "gets inside and goes to a random floor.\n" +
                               "If their security clearance is not enough,\n" +
                               "the doors won't open and they have to choose\n" +
-                              "another level or somebody else might be faster\n" +
-                              "and call the elevator on another floor. If they\n" +
-                              "can leave on this floor, they do it.\n");
+                              "another floor. If they can leave on this floor,\n" +
+                              "they do it. An agent goes home if they've been to\n" +
+                              "at least one floor other than G and then return to G.\n");
 
             Console.WriteLine("Press ENTER to begin the simulation!");
             Console.ReadLine();
+            Console.Clear();
         }
 
         static void BlackMesaLogo() {

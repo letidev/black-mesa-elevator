@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading;
-using Console = Colorful.Console;
 
 namespace BlackMesa {
     class Agent {
@@ -24,43 +23,45 @@ namespace BlackMesa {
         }
 
         public void GoToWork() {
+            Elevator.Print($"{Name} has arrived to work.", Color.Pink, 100);
             while (!LeftWork.WaitOne(0)) {
                 Elevator.Occupy(this);
                 if (InElevator.WaitOne(0)) {
                     InElevator.WaitOne();
                 }
-                Thread.Sleep(2000);
+                Thread.Sleep(5000);
             }
         }
 
         public void GoHome() {
-            Console.WriteLine($"{Name} has called it a day.", Color.Red);
+            
+            Elevator.Print($"{Name} has called it a day.", Color.Red, 100);
+            
             LeftWork.Set();
         }
 
         public bool CanLeaveAtFloor(Floor floor) {
             if ((int)Clearance < (int)floor) {
-                Console.WriteLine($"{Name} cannot leave on floor {floor} due to low clearance level", ConsoleColor);
+                Elevator.Print($"{Name} cannot leave on floor {floor} due to low clearance level", ConsoleColor, 100);
                 return false;
             }
             return true;
         }
 
         public Floor GetRandomFloor() {
-            // 10 percent for picking ground floor
-            // 30 percent for all other floors
             Random rand = new Random();
             Floor newFloor;
             int val;
+            // percentages are 30, 20, 30, 20
             do {
                 val = rand.Next(10);
-                if (val == 0) {
-                    newFloor = Floor.S;
-                }
-                else if (val < 4) {
+                if (val < 3 ) {
                     newFloor = Floor.G;
                 }
-                else if (val < 7) {
+                else if (val < 5) {
+                    newFloor = Floor.S;
+                }
+                else if (val < 8) {
                     newFloor = Floor.T1;
                 }
                 else {

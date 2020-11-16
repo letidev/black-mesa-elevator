@@ -5,73 +5,45 @@ using Console = Colorful.Console;
 
 namespace BlackMesa {
     class Elevator {
-        public Floor CurrentFloor { get; private set; }
+        private Floor CurrentFloor { get; set; }
 
         // set - agent inside
         // released - empty
-        public ManualResetEvent eventIsOccupied;
+        private ManualResetEvent eventIsOccupied;
 
-        // set - moving
-        // released - not moving -> it can be called either
-        //   by the agent inside (if any) or by another from
-        //   another floor
-        private ManualResetEvent eventIsMoving;
-
-        // set - the door is closed
-        // released - the door is closed
-        private ManualResetEvent eventIsDoorClosed;
-
-        public Agent CurrentAgent;
+        private Agent CurrentAgent;
 
         // miscelaneous props
         private Color ConsoleColor = Color.White;
         private object locker = new object();
+        private object consoleLocker = new object();
 
         public Elevator() {
             CurrentFloor = Floor.G;
             eventIsOccupied = new ManualResetEvent(false);
-            eventIsMoving = new ManualResetEvent(false);
-            eventIsDoorClosed = new ManualResetEvent(false);
             CurrentAgent = null;
         }
 
-        private void Move(Floor floor) {
-            //eventIsMoving.Set();
-            Console.WriteLine($"Elevator is moving from floor {CurrentFloor.ToString()} to {floor.ToString()}.", ConsoleColor);
-            int travelTime = Math.Abs(CurrentFloor - floor) * 2000;
-            CurrentFloor = floor;
-            Thread.Sleep(travelTime);
-            Console.WriteLine($"Elevator has arrived at floor {CurrentFloor.ToString()}.", ConsoleColor);
-            //eventIsMoving.Reset();
-        }
-
         public void Occupy(Agent agent) {
-            if (CurrentFloor == Floor.G && agent.HasWorked.WaitOne(0)) {
-                return;
-            }
-
-            if (!IsOccupied) {
-                lock (eventIsOccupied) {
+            if (!eventIsOccupied.WaitOne(0)) {
+                lock (locker) {
                     eventIsOccupied.Set();
                     CurrentAgent = agent;
-                    // if the agent has traveled at least once with the 
-                    // elevator, he's done good job and next time 
-                    // he arrives at floor G, he can leave.
                     CurrentAgent.InElevator.Set();
                     CurrentAgent.HasWorked.Set();
                     Call();
                 }
             }
             else {
-                Console.WriteLine($"{agent.Name} cannot call the elevator as it is currently occupied.", agent.ConsoleColor);
+                Print($"{agent.Name} cannot call the elevator as it is currently occupied by {CurrentAgent.Name}", agent.ConsoleColor, 1000);
                 return;
-
             }
         }
 
-        public void Call() {
+        private void Call() {
             if (CurrentFloor != CurrentAgent.CurrentFloor) {
-                Console.WriteLine($"{CurrentAgent.Name} called the elevator to floor {CurrentAgent.CurrentFloor.ToString()}.", CurrentAgent.ConsoleColor);
+                Print($"{CurrentAgent.Name} called the elevator to floor {CurrentAgent.CurrentFloor.ToString()}.", CurrentAgent.ConsoleColor, 200);
+                
                 CloseDoor();
                 Move(CurrentAgent.CurrentFloor);
                 OpenDoor();
@@ -79,17 +51,16 @@ namespace BlackMesa {
             Enter();
         }
 
-        public void Enter() {
-            Console.WriteLine($"{CurrentAgent.Name} is entering the elevator", CurrentAgent.ConsoleColor);
-            Thread.Sleep(1000);
+        private void Enter() {
+            Print($"{CurrentAgent.Name} is entering the elevator", CurrentAgent.ConsoleColor, 500);
             GoToFloor(CurrentAgent.GetRandomFloor());
         }
 
-        public void GoToFloor(Floor floor) {
-            Console.WriteLine($"{CurrentAgent.Name} chose to go to floor {floor.ToString()}.", CurrentAgent.ConsoleColor);
+        private void GoToFloor(Floor floor) {
+            Print($"{CurrentAgent.Name} chose to go to floor {floor.ToString()}.", CurrentAgent.ConsoleColor, 100);
             CloseDoor();
             Move(floor);
-            Console.WriteLine($"{CurrentAgent.Name} has arrived at floor {CurrentFloor}", CurrentAgent.ConsoleColor);
+            Print($"{CurrentAgent.Name} has arrived at floor {CurrentFloor}", CurrentAgent.ConsoleColor, 100);
             CurrentAgent.CurrentFloor = CurrentFloor;
 
             if (CurrentAgent.CanLeaveAtFloor(CurrentFloor)) {
@@ -101,54 +72,37 @@ namespace BlackMesa {
             }
         }
 
-        public void Leave() {
-            Console.WriteLine($"{CurrentAgent.Name} is leaving the elevator at floor {CurrentFloor}", CurrentAgent.ConsoleColor);
+        private void Leave() {
+            Print($"{CurrentAgent.Name} is leaving the elevator at floor {CurrentFloor}", CurrentAgent.ConsoleColor, 200);
             CurrentAgent.InElevator.Reset();
             if (CurrentFloor == Floor.G) {
                 CurrentAgent.GoHome();
             }
-            lock (eventIsOccupied) {
-                eventIsOccupied.Reset();
-                CurrentAgent = null;
-                //Thread.Sleep(1000);
-            }
+            CurrentAgent = null;
+            eventIsOccupied.Reset();
+
         }
 
-        // Door actions
+        // door actions and movement
         private void OpenDoor() {
-            eventIsDoorClosed.Reset();
-            Console.WriteLine("Door is opening", ConsoleColor);
-            Thread.Sleep(2000);
+            Print("Door is opening", ConsoleColor, 2000);
         }
 
         private void CloseDoor() {
-            eventIsDoorClosed.Set();
-            Console.WriteLine("Door is closing", ConsoleColor);
-            Thread.Sleep(2000);
+            Print("Door is closing", ConsoleColor, 2000);
         }
 
-        // check elevator status parametres
-        public bool IsMoving {
-            get {
-                lock (eventIsMoving) {
-                    return eventIsMoving.WaitOne(0);
-                }
-            }
+        private void Move(Floor floor) {
+            int travelTime = Math.Abs(CurrentFloor - floor) * 2000;
+            Print($"Elevator is moving from floor {CurrentFloor.ToString()} to {floor.ToString()}.", ConsoleColor, travelTime);
+            CurrentFloor = floor;
+            Print($"Elevator has arrived at floor {CurrentFloor.ToString()}.", ConsoleColor, 100);
         }
 
-        public bool IsOccupied {
-            get {
-                lock (eventIsOccupied) {
-                    return eventIsOccupied.WaitOne(0);
-                }
-            }
-        }
-
-        public bool IsDoorClosed {
-            get {
-                lock (eventIsDoorClosed) {
-                    return eventIsDoorClosed.WaitOne(0);
-                }
+        public void Print(string text, Color color, int sleepTime) {
+            lock(consoleLocker) {
+                Console.WriteLine(text, color);
+                Thread.Sleep(sleepTime);
             }
         }
     }
