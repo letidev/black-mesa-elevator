@@ -1,0 +1,80 @@
+Barney Calhoun cannot leave on floor T2 due to low clearance level
+Barney Calhoun chose to go to floor T1.
+Door is closing
+Elevator is moving from floor T2 to T1.
+Elevator has arrived at floor T1.
+Barney Calhoun has arrived at floor T1
+Barney Calhoun cannot leave on floor T1 due to low clearance level
+Barney Calhoun chose to go to floor G.
+Door is closing
+Elevator is moving from floor T1 to G.
+Elevator has arrived at floor G.
+Barney Calhoun has arrived at floor G
+Door is opening
+Barney Calhoun is leaving the elevator at floor G
+Barney Calhoun has called it a day.
+Dr. Gordon Freeman is entering the elevator
+Dr. Gordon Freeman chose to go to floor T1.
+Door is closing
+Elevator is moving from floor G to T1.
+Elevator has arrived at floor T1.
+Dr. Gordon Freeman has arrived at floor T1
+Door is opening
+Dr. Gordon Freeman is leaving the elevator at floor T1
+Dr. Eli Vance called the elevator to floor G.
+Door is closing
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Elevator is moving from floor T1 to G.
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Elevator has arrived at floor G.
+Door is opening
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Dr. Eli Vance is entering the elevator
+Dr. Eli Vance chose to go to floor S.
+Door is closing
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Elevator is moving from floor G to S.
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Elevator has arrived at floor S.
+Dr. Eli Vance has arrived at floor S
+Door is opening
+Dr. Gordon Freeman cannot call the elevator as it is currently occupied by Dr. Eli Vance.
+Dr. Eli Vance is leaving the elevator at floor S
+Dr. Gordon Freeman called the elevator to floor T1.
+Door is closing
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Elevator is moving from floor S to T1.
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Elevator has arrived at floor T1.
+Door is opening
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Dr. Gordon Freeman is entering the elevator
+Dr. Gordon Freeman chose to go to floor G.
+Door is closing
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Elevator is moving from floor T1 to G.
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Elevator has arrived at floor G.
+Dr. Gordon Freeman has arrived at floor G
+Door is opening
+Dr. Eli Vance cannot call the elevator as it is currently occupied by Dr. Gordon Freeman.
+Dr. Gordon Freeman is leaving the elevator at floor G
+Dr. Gordon Freeman has called it a day.
+Dr. Eli Vance called the elevator to floor S.
+Door is closing
+Elevator is moving from floor G to S.
+Elevator has arrived at floor S.
+Door is opening
+Dr. Eli Vance is entering the elevator
+Dr. Eli Vance chose to go to floor G.
+Door is closing
+Elevator is moving from floor S to G.
+Elevator has arrived at floor G.
+Dr. Eli Vance has arrived at floor G
+Door is opening
+Dr. Eli Vance is leaving the elevator at floor G
+Dr. Eli Vance has called it a day.
+Everyone left work
+Press ENTER to exit.
