@@ -4,11 +4,8 @@ using Console = Colorful.Console;
 
 namespace BlackMesa {
     class Program {
-        static void Main() {
-            Introduction();
 
-            Elevator elevator = new Elevator();
-
+        static void StartAgents(Elevator elevator) {
             Thread[] threads = new Thread[3];
             Agent[] agents = new Agent[3];
             agents[0] = new Agent("Dr. Gordon Freeman", Color.Orange, Clearance.TopSecret, elevator);
@@ -20,19 +17,32 @@ namespace BlackMesa {
                 threads[i].Priority = ThreadPriority.AboveNormal;
             }
 
-            foreach(var t in threads) {
+            foreach (var t in threads) {
                 t.Start();
             }
 
-            foreach(var t in threads) {
+            foreach (var t in threads) {
                 t.Join();
             }
-            
             Console.WriteLine("Everyone left work", Color.Red);
+        }
+
+        static void ElevatorThreadWorker() {
+            Elevator elevator = new Elevator();
+            StartAgents(elevator);
+            Console.WriteLine("Elevator stopped working for today.", Color.Red);
+        }
+
+        static void Main() {
+            // Introduction();
+
+            Thread elevatorThread = new Thread(ElevatorThreadWorker);
+            elevatorThread.Start();
+            elevatorThread.Join();
+            
             Console.WriteLine("Press ENTER to exit.", Color.White);
             Console.ReadLine();
         }
-
 
         static void Introduction() {
             
