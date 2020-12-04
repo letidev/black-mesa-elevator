@@ -25,18 +25,22 @@ namespace BlackMesa {
         public void GoToWork() {
             Elevator.Print($"{Name} has arrived to work.", Color.Pink, 100);
             while (!LeftWork.WaitOne(0)) {
-                Elevator.Occupy(this);
-                if (InElevator.WaitOne(0)) {
-                    InElevator.WaitOne();
+                if (!InElevator.WaitOne(0)) {
+                    Elevator.Occupy(this);  
                 }
-                Thread.Sleep(5000);
+
+                // wait for a random period of time between 3 and 5 seconds
+                // before attempting to call the elevator again
+                Random rand = new Random();
+                int time = 3 + rand.Next(3);
+                Thread.Sleep(time*1000);
             }
         }
 
         public void GoHome() {
-            
+
             Elevator.Print($"{Name} has called it a day.", Color.Red, 100);
-            
+
             LeftWork.Set();
         }
 
@@ -55,7 +59,7 @@ namespace BlackMesa {
             // percentages are 30, 20, 30, 20
             do {
                 val = rand.Next(10);
-                if (val < 3 ) {
+                if (val < 3) {
                     newFloor = Floor.G;
                 }
                 else if (val < 5) {

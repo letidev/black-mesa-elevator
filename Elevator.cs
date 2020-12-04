@@ -9,7 +9,7 @@ namespace BlackMesa {
 
         // set - agent inside
         // released - empty
-        private ManualResetEvent eventIsOccupied;
+        public ManualResetEvent eventIsOccupied;
 
         private Agent CurrentAgent;
 
@@ -27,11 +27,10 @@ namespace BlackMesa {
         public void Occupy(Agent agent) {
             if (!eventIsOccupied.WaitOne(0)) {
                 lock (locker) {
-                    eventIsOccupied.Set();
                     CurrentAgent = agent;
+                    eventIsOccupied.Set();
                     CurrentAgent.InElevator.Set();
                     CurrentAgent.HasWorked.Set();
-                    Call();
                 }
             }
             else {
@@ -40,7 +39,7 @@ namespace BlackMesa {
             }
         }
 
-        private void Call() {
+        public void Call() {
             if (CurrentFloor != CurrentAgent.CurrentFloor) {
                 Print($"{CurrentAgent.Name} called the elevator to floor {CurrentAgent.CurrentFloor.ToString()}.", CurrentAgent.ConsoleColor, 200);
                 
@@ -74,13 +73,11 @@ namespace BlackMesa {
 
         private void Leave() {
             Print($"{CurrentAgent.Name} is leaving the elevator at floor {CurrentFloor}", CurrentAgent.ConsoleColor, 200);
-            CurrentAgent.InElevator.Reset();
             if (CurrentFloor == Floor.G) {
                 CurrentAgent.GoHome();
             }
-            CurrentAgent = null;
             eventIsOccupied.Reset();
-
+            CurrentAgent.InElevator.Reset();
         }
 
         // door actions and movement
