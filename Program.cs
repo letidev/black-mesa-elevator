@@ -59,7 +59,7 @@ namespace BlackMesa {
         }
 
         static void Main() {
-            // Introduction();
+            Introduction();
 
             Thread elevatorThread = new Thread(ElevatorThreadWorker);
             elevatorThread.Start();
