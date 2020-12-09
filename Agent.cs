@@ -13,6 +13,7 @@ namespace BlackMesa {
         public ManualResetEvent LeftWork = new ManualResetEvent(false);
         public ManualResetEvent InElevator = new ManualResetEvent(false);
         public ManualResetEvent HasWorked = new ManualResetEvent(false);
+        public ManualResetEvent LeftElevator = new ManualResetEvent(true);
 
         public Agent(string name, Color color, Clearance clearance, Elevator elevator) {
             Name = name;
@@ -26,7 +27,10 @@ namespace BlackMesa {
             Elevator.Print($"{Name} has arrived to work.", Color.Pink, 100);
             while (!LeftWork.WaitOne(0)) {
                 if (!InElevator.WaitOne(0)) {
-                    Elevator.Occupy(this);  
+                    Elevator.Occupy(this);
+                }
+                else {
+                    LeftElevator.WaitOne();
                 }
 
                 // wait for a random period of time between 3 and 5 seconds

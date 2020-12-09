@@ -30,6 +30,7 @@ namespace BlackMesa {
                     CurrentAgent = agent;
                     eventIsOccupied.Set();
                     CurrentAgent.InElevator.Set();
+                    CurrentAgent.LeftElevator.Reset();
                     CurrentAgent.HasWorked.Set();
                 }
             }
@@ -78,6 +79,7 @@ namespace BlackMesa {
             }
             eventIsOccupied.Reset();
             CurrentAgent.InElevator.Reset();
+            CurrentAgent.LeftElevator.Set();
         }
 
         // door actions and movement
