@@ -4,11 +4,16 @@ using Console = Colorful.Console;
 
 namespace BlackMesa {
     class Program {
-        static void Main() {
-            Introduction();
 
-            Elevator elevator = new Elevator();
+        static Elevator elevator;
+        static ManualResetEvent elevatorStarted = new ManualResetEvent(false);
+        static ManualResetEvent everyoneLeftWork = new ManualResetEvent(false);
 
+        static void StartAgents() {
+            // start the agent threads only after the elevator thread 
+            // has started working otherwise they cannot be instantiated
+            elevatorStarted.WaitOne();
+            
             Thread[] threads = new Thread[3];
             Agent[] agents = new Agent[3];
             agents[0] = new Agent("Dr. Gordon Freeman", Color.Orange, Clearance.TopSecret, elevator);
@@ -20,19 +25,51 @@ namespace BlackMesa {
                 threads[i].Priority = ThreadPriority.AboveNormal;
             }
 
-            foreach(var t in threads) {
+            foreach (var t in threads) {
                 t.Start();
             }
 
-            foreach(var t in threads) {
+            foreach (var t in threads) {
                 t.Join();
             }
-            
+
+            // everyone has left so the elevator
+            // can stop working too
+            everyoneLeftWork.Set();
             Console.WriteLine("Everyone left work", Color.Red);
+        }
+
+        static void ElevatorThreadWorker() {
+            Console.WriteLine("Elevator started working.", Color.Pink);
+            
+            elevator = new Elevator();
+            elevatorStarted.Set();
+
+            // while there are agents at work
+            // the elevator will be working
+            while (!everyoneLeftWork.WaitOne(0)) {
+                // if an agent has "occupied" the elevator
+                // the whole chain of actions is started
+                if(elevator.eventIsOccupied.WaitOne(0) ) {
+                    elevator.Call();
+                }
+            }
+
+            Console.WriteLine("Elevator stopped working for today.", Color.Red);
+        }
+
+        static void Main() {
+            Introduction();
+
+            Thread elevatorThread = new Thread(ElevatorThreadWorker);
+            elevatorThread.Start();
+            
+            StartAgents();
+            elevatorThread.Join();
+            
             Console.WriteLine("Press ENTER to exit.", Color.White);
             Console.ReadLine();
         }
-
 
         static void Introduction() {
             
